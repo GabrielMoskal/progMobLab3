@@ -22,14 +22,18 @@ export default class App extends Component<Props> {
 
   constructor(props) {
     super(props);
+    this.btnShowName = "Pokaż";
+    this.btnHideName = "Ukryj";
     this.state = {
-      isHidden: true
+      isHidden: true,
+      btnName: this.btnShowName
     };
   }
 
   onPress = () => {
     this.setState({
-      isHidden: !this.state.isHidden
+      isHidden: !this.state.isHidden,
+      btnName: !this.state.isHidden ? this.btnShowName : this.btnHideName
     });
   }
 
@@ -38,7 +42,7 @@ export default class App extends Component<Props> {
       <View style={styles.container}>
         <Text style={styles.welcome}>Zadanie 2</Text>
         <TouchableOpacity style={styles.button} onPress={this.onPress}>
-          <Text> Show </Text>
+          <Text>{this.state.btnName}</Text>
         </TouchableOpacity>
         {
           this.state.isHidden ? <View/> :
