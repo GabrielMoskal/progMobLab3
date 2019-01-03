@@ -7,15 +7,13 @@
  */
 
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View, TouchableOpacity, ButtonGroup} from 'react-native';
+import {Platform, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import _ from 'lodash';
 
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
-  android:
-    'Double tap R on your keyboard to reload,\n' +
-    'Shake or press menu button for dev menu',
-});
+insertedValueString = "0";
+buffer1 = 0.0;
+buffer2 = 0.0;
+chosenAction = "";
 
 type Props = {};
 export default class App extends Component<Props> {
@@ -23,44 +21,47 @@ export default class App extends Component<Props> {
   constructor(props) {
     super(props);
 
-    this.result = 0;
-
-    this.insertedValueString = "";
-
-    this.state = {
-      selectedIndex: 2
-    }
-    this.updateIndex = this.updateIndex.bind(this)
-
-
-
-    this.numButtons = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-
-
     this.btnShowName = "Pokaż";
     this.btnHideName = "Ukryj";
     this.state = {
       isHidden: true,
-      btnName: this.btnShowName
+      btnName: this.btnShowName,
+      result: 0
     };
   }
 
-  updateIndex (selectedIndex) {
-    this.setState({selectedIndex});
-  }
-
   onPress = () => {
-    console.log(this.props.activeOpacity);
+    buffer2 = parseFloat(insertedValueString);
+    insertedValueString = "0";
+
+    if (chosenAction == "+") {
+      this.setState({result: buffer1 + buffer2});
+    } else if (chosenAction == "-") {
+      this.setState({result: buffer1 - buffer2});
+    } else if (chosenAction == "*") {
+      this.setState({result: buffer1 * buffer2});
+    } else if (chosenAction == "/") {
+      this.setState({result: buffer1 / buffer2});
+    }
   }
 
   renderButtons = () => {
     const buttons = [];
-    for (let i = 0; i <= 9; i++) {
+    buttons.push(<ButtonReset onPress={this.onPress} text="AC"/>);
+    buttons.push(
+      <TouchableOpacity style={styles.button}>
+      </TouchableOpacity>
+    );
+    buttons.push(
+      <TouchableOpacity style={styles.button}>
+      </TouchableOpacity>
+    );
+    for (let i = 9; i >= 0; i--) {
       buttons.push(
-        <ButtonNumber onPress={this.onPress} text={i}/>
+        <ButtonNumber style="order" text={i}/>
       );
     }
-    buttons.push(<ButtonNumber onPress={this.onPress} text=","/>);
+    buttons.push(<ButtonNumber text="."/>);
     return buttons;
   }
 
@@ -71,26 +72,73 @@ export default class App extends Component<Props> {
 
         <Text style={styles.welcome}>Kalkulator</Text>
 
-        <Text>{this.result}</Text>
+        <Text>{this.state.result}</Text>
 
-        <ButtonGroup
-          // onPress={this.updateIndex}
-          // selectedIndex={selectedIndex}
-          // buttons={this.renderButtons}
-          // containerStyle={{height: 100}}
-        />
 
+        <View style={styles.buttons}>
+          <View style={styles.buttonsNumber}>
+            {this.renderButtons()}
+          </View>
+
+          <View style={styles.buttonsAction}>
+            <ButtonAction onPress={this.onPress} text="/"/>
+            <ButtonAction onPress={this.onPress} text="*"/>
+            <ButtonAction onPress={this.onPress} text="+"/>
+            <ButtonAction onPress={this.onPress} text="-"/>
+            <TouchableOpacity style={styles.button} onPress={this.onPress}>
+              <Text>=</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
+
     );
   }
 }
 
 class ButtonNumber extends Component {
 
+  onPress = () => {
+    insertedValueString += this.props.text;
+  }
+
   render() {
-    const { text, onPress} = this.props;
     return (
-      <TouchableOpacity style={styles.button} onPress={() => onPress()}>
+      <TouchableOpacity style={styles.button} onPress={this.onPress}>
+        <Text>{this.props.text}</Text>
+      </TouchableOpacity>
+    );
+  }
+}
+
+class ButtonAction extends Component {
+
+  onPress = () => {
+    buffer1 = parseFloat(insertedValueString);
+    insertedValueString = "0";
+    chosenAction = this.props.text;
+  }
+
+  render() {
+    return (
+      <TouchableOpacity style={styles.button} onPress={this.onPress}>
+        <Text>{this.props.text}</Text>
+      </TouchableOpacity>
+    );
+  }
+}
+
+class ButtonReset extends Component {
+  onPress = () => {
+    buffer1 = 0.0;
+    buffer2 = 0.0;
+    insertedValueString = "0";
+    chosenAction = "";
+  }
+
+  render() {
+    return (
+      <TouchableOpacity style={styles.button} onPress={this.onPress}>
         <Text>{this.props.text}</Text>
       </TouchableOpacity>
     );
@@ -100,8 +148,8 @@ class ButtonNumber extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    alignItems: 'center'
+    alignItems: 'center',
+    flex: 1
   },
   welcome: {
     fontSize: 20,
@@ -109,12 +157,22 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   buttons: {
-    flex: 1,
     flexDirection: 'row',
-    alignItems: 'center'
+  },
+  buttonsNumber: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    width: 150,
+  },
+  buttonsAction: {
+    flexDirection: 'column',
+    flexWrap: 'wrap'
   },
   button: {
     backgroundColor: '#DDDDDD',
-    padding: 10
+    padding: 10,
+    width: 50,
+    height: 50,
+    flexGrow: 1
   },
 });
