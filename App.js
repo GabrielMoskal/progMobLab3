@@ -7,7 +7,7 @@
  */
 
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
+import {Platform, StyleSheet, Text, View, TouchableOpacity, ButtonGroup} from 'react-native';
 import _ from 'lodash';
 
 const instructions = Platform.select({
@@ -22,6 +22,21 @@ export default class App extends Component<Props> {
 
   constructor(props) {
     super(props);
+
+    this.result = 0;
+
+    this.insertedValueString = "";
+
+    this.state = {
+      selectedIndex: 2
+    }
+    this.updateIndex = this.updateIndex.bind(this)
+
+
+
+    this.numButtons = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+
     this.btnShowName = "Pokaż";
     this.btnHideName = "Ukryj";
     this.state = {
@@ -30,36 +45,62 @@ export default class App extends Component<Props> {
     };
   }
 
+  updateIndex (selectedIndex) {
+    this.setState({selectedIndex});
+  }
+
   onPress = () => {
-    this.setState({
-      isHidden: !this.state.isHidden,
-      btnName: !this.state.isHidden ? this.btnShowName : this.btnHideName
-    });
+    console.log(this.props.activeOpacity);
+  }
+
+  renderButtons = () => {
+    const buttons = [];
+    for (let i = 0; i <= 9; i++) {
+      buttons.push(
+        <ButtonNumber onPress={this.onPress} text={i}/>
+      );
+    }
+    buttons.push(<ButtonNumber onPress={this.onPress} text=","/>);
+    return buttons;
   }
 
   render() {
+    const { selectedIndex } = this.state;
     return (
       <View style={styles.container}>
-        <Text style={styles.welcome}>Zadanie 2</Text>
-        <TouchableOpacity style={styles.button} onPress={this.onPress}>
-          <Text>{this.state.btnName}</Text>
-        </TouchableOpacity>
-        {
-          this.state.isHidden ? <View/> :
-          <View>
-            <Text>Nazywam się</Text>
-            <Text>Gabriel Moskal</Text>
-          </View>
-        }
+
+        <Text style={styles.welcome}>Kalkulator</Text>
+
+        <Text>{this.result}</Text>
+
+        <ButtonGroup
+          // onPress={this.updateIndex}
+          // selectedIndex={selectedIndex}
+          // buttons={this.renderButtons}
+          // containerStyle={{height: 100}}
+        />
+
       </View>
     );
   }
 }
 
+class ButtonNumber extends Component {
+
+  render() {
+    const { text, onPress} = this.props;
+    return (
+      <TouchableOpacity style={styles.button} onPress={() => onPress()}>
+        <Text>{this.props.text}</Text>
+      </TouchableOpacity>
+    );
+  }
+}
+
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center'
   },
   welcome: {
@@ -67,8 +108,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     margin: 10,
   },
+  buttons: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
   button: {
-    alignItems: 'center',
     backgroundColor: '#DDDDDD',
     padding: 10
   },
